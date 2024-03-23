@@ -49,7 +49,6 @@ contract FrameMakerFactoryTest is Test {
         f.priceWif = PRICE_WIF;
         f.priceWifout = PRICE_WIFOUT;
         f.creator = creator;
-        f.priceToken = address(token);
         f.gateToken = address(token);
         f.tokenURI = "test";
         f.name = "test";

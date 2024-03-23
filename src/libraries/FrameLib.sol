@@ -15,7 +15,6 @@ library FrameLib {
         uint256 priceWif;
         uint256 priceWifout;
         address creator;
-        address priceToken;
         address gateToken;
         string tokenURI;
         string name;

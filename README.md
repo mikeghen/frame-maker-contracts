@@ -54,3 +54,11 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+
+## Deployment Addresses
+
+### Base Sepolia 
+Factory: 0xC46e61C0E92D7d66E7185a8f1eb3726294a4DB9E
+Gate Token: 0x8801ED4695035aaCFf23b93559932D91db713f2E
+Frame Token: 0x38176833c35d86beF7E0fef2eab7b7e352494F04
