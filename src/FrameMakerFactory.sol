@@ -1,46 +1,47 @@
 // SPDX License: MIT
 pragma solidity 0.8.24;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
+import "./interfaces/IFrameMakerFactory.sol";
+import "./interfaces/IFrameToken.sol";
+import "./FrameToken.sol";
+import "./libraries/FrameLib.sol";
 
-// @title Frame Maker Factory
-// @notice 
 contract FrameMakerFactory is IFrameMakerFactory, Ownable {
-    
+
     // Variables ////////////
     mapping(address => address) public userFrames;
     mapping(address => address) public frameUsers;
     address public frameTokenImplementation; 
     uint256 public mintFee;
-    uint256 public createFee
+    uint256 public createFee;
 
-    constructor(InitParams memory params) {
-        frameTokenImplementation = params.implementation;
-        mintFee = params.mintFee;
-        createFee = params.createFee;
+    constructor(FrameLib.Factory memory factory) Ownable(factory.owner) {
+        mintFee = factory.mintFee;
+        createFee = factory.createFee;
     }
 
-    function createFrame(Frame memory frameTokenImplementation) external returns (address) {
-        Compensator compensator = new Compensator();       
-        compensator.initialize(delegatee, delegateeName);
-        compensators.push(address(compensator));
-        delegateeToCompensator[delegatee] = address(compensator);
-        return address(compensator);
+    function createFrame(FrameLib.Frame memory frame) external returns (address frameToken) {
+        frameToken = address(new FrameToken(frame));
+        userFrames[frame.creator] = frameToken;
+        frameUsers[frameToken] = frame.creator;
     }
 
-    function getCompensator(address delegatee) external view returns (address) {
-        return delegateeToCompensator[delegatee];
+    function getFrame(address creator) external view returns (address frameToken) {
+        frameToken = userFrames[creator];
     }
 
-    function createFrame(Frame memory frame) {
-
+    function getCreator(address frameToken) external view returns (address creator) {
+        creator = frameUsers[frameToken];
     }
 
-    function getFrameByUser(address user) {
-
+    function getFrameInfo(address frameToken) external view returns (FrameLib.Frame memory frame) {
+        frame = IFrameToken(frameToken).getFrame();
     }
 
-    function getUserByFrame(address frameToken) {
-
+    function getFeeRecipient() external view returns (address) {
+        return owner();
     }
  
 }
