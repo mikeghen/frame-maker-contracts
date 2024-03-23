@@ -36,7 +36,9 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ export PRIVATE_KEY=0x...
+$ export OWNER=0x...
+$ forge script script/FrameMakerDeploy.s.sol:FrameMakerDeploy --rpc-url <rpc-url>
 ```
 
 ### Cast
