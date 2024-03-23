@@ -19,6 +19,8 @@ contract MockERC20 is ERC20 {
 
 
 contract FrameMakerFactoryTest is Test {
+    uint256 internal constant PRICE_WIF = 0.5 ether;
+    uint256 internal constant PRICE_WIFOUT = 1 ether;
     FrameMakerFactory internal factory;
     address internal factoryOwner = makeAddr("factoryOwner");
     address internal creator1 = makeAddr("creator1");
@@ -44,8 +46,8 @@ contract FrameMakerFactoryTest is Test {
     function _createFrame(address creator) internal returns (address) {
         FrameLib.Frame memory f;
         f.maxSupply = 100;
-        f.priceWif = 100;
-        f.priceWifout = 100;
+        f.priceWif = PRICE_WIF;
+        f.priceWifout = PRICE_WIFOUT;
         f.creator = creator;
         f.priceToken = address(token);
         f.gateToken = address(token);
@@ -53,13 +55,14 @@ contract FrameMakerFactoryTest is Test {
         f.name = "test";
         f.symbol = "test";
 
+        vm.prank(creator1);
         return factory.createFrame(f);
     }
 
     function test_deploy() public view {
         assertEq(factory.owner(), factoryOwner);
-        assertEq(factory.createFee(), 100);
-        assertEq(factory.mintFee(), 100);
+        assertEq(factory.createFee(), 100); // basis points
+        assertEq(factory.mintFee(), 100); // basis points
     }
 
     function test_createFrame() public {
@@ -69,8 +72,8 @@ contract FrameMakerFactoryTest is Test {
         assertEq(factory.getCreator(frameToken), creator1);
         FrameLib.Frame memory frame = factory.getFrameInfo(frameToken);
         assertEq(frame.maxSupply, 100);
-        assertEq(frame.priceWif, 100);
-        assertEq(frame.priceWifout, 100);
+        assertEq(frame.priceWif, PRICE_WIF);
+        assertEq(frame.priceWifout, PRICE_WIFOUT);
         assertEq(frame.creator, creator1);
         assertEq(frame.gateToken, address(token));
         assertEq(frame.tokenURI, "test");
@@ -87,6 +90,10 @@ contract FrameMakerFactoryTest is Test {
 
         vm.prank(buyer1);
         ft.buy{value: frame.priceWifout}();
+
+        uint256 fee = frame.priceWifout / 100;
+        assertEq(payable(creator1).balance, frame.priceWifout - fee);
+        assertEq(payable(factory.getFeeRecipient()).balance, fee);
     }
 
     function test_buyWithToken() public {
@@ -100,6 +107,10 @@ contract FrameMakerFactoryTest is Test {
 
         vm.prank(buyer1);
         ft.buy{value: frame.priceWif}();
+
+        uint256 fee = frame.priceWif / 100;
+        assertEq(payable(creator1).balance, frame.priceWif - fee);
+        assertEq(payable(factory.getFeeRecipient()).balance, fee);
     }
 
 }

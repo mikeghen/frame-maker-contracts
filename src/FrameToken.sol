@@ -32,11 +32,11 @@ contract FrameToken is IFrameToken, ERC721, ERC721Enumerable {
         uint256 fee = 0;
         uint256 price = 0;
         FrameLib.Frame memory f = frame;
-        
+
         require(totalSupply() < f.maxSupply, "FrameToken: max supply reached");
 
         // Determine price of the token
-        if (IERC721(f.gateToken).balanceOf(msg.sender) >= 0) {
+        if (IERC721(f.gateToken).balanceOf(msg.sender) > 0) {
             price = f.priceWif;
         } else {
             price = f.priceWifout;
@@ -47,7 +47,7 @@ contract FrameToken is IFrameToken, ERC721, ERC721Enumerable {
         _mint(msg.sender, nextTokenId);
 
         // Collect Payment
-        fee = (price * factory.mintFee()) / 1e4;
+        fee = price * factory.mintFee() / 1e4;
         payable(factory.getFeeRecipient()).transfer(fee);
         payable(f.creator).transfer(price - fee);
     }
